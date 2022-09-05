@@ -3,7 +3,7 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const app = express();
-
+const { MongoClient, ServerApiVersion } = require('mongodb');
 const port = process.env.PORT || 4000;
 
 
@@ -11,10 +11,28 @@ app.use(cors());
 app.use(express.json());
 
 
-app.get('/', (req, res) =>{
-    res.send('Wellcome to Electric Saw Hub');
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.rrjseia.mongodb.net/?retryWrites=true&w=majority`;
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
+async function run() {
+    try {
+        await client.connect();
+        const productCollection = client.db('sk_saw').collection('products');
+
+
+    }
+    finally {
+
+    }
+}
+
+run().catch(console.dir);
+
+
+
+app.get('/', (req, res) => {
+    res.send('Wellcome to SK Saw Hub');
 });
 
-app.listen(port, () =>{
-    console.log(`Connected To Electric Saw Hub ${port}`);
+app.listen(port, () => {
+    console.log(`Connected To SK Saw Hub ${port}`);
 });
