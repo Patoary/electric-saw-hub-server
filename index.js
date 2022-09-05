@@ -18,7 +18,11 @@ async function run() {
         await client.connect();
         const productCollection = client.db('sk_saw').collection('products');
 
-
+        app.get('/product', async (req, res) => {
+            const query = {};
+            const product = await productCollection.find(query).toArray();
+            res.send(product);
+        });
     }
     finally {
 
