@@ -3,7 +3,7 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const app = express();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 4000;
 
 
@@ -19,6 +19,7 @@ async function run() {
         await client.connect();
         const productCollection = client.db('sk_saw').collection('products');
         const reviewCollection = client.db('sk_saw').collection('reviews');
+        const orderCollection = client.db('sk_saw').collection('orders');
 
 
         app.get('/product', async (req, res) => {
@@ -26,17 +27,26 @@ async function run() {
             const product = await productCollection.find(query).toArray();
             res.send(product);
         });
+        
+        app.get('/product/:id', async(req, res) => {
+            const id = req.params;
+            const query ={ _id:ObjectId(id)};
+            const result = await productCollection.findOne(query);
+            res.send(result);
+        });
 
         app.get('/review', async(req, res) => {
             const review = await reviewCollection.find().toArray();
             res.send(review);
         });
 
+
+
     }
     finally {
 
     }
-}
+};
 
 run().catch(console.dir);
 
