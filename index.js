@@ -39,11 +39,21 @@ async function run() {
             const review = await reviewCollection.find().toArray();
             res.send(review);
         });
+        app.post('/review', async(req, res) =>{
+            const review = req.body;
+            const result = await reviewCollection.insertOne(review);
+            res.send({ success: true, result });
+        });
 
         app.post('/order', async(req, res) =>{
             const order = req.body;
             const result = await orderCollection.insertOne(order);
             res.send({ success: true, result});
+        });
+
+        app.get('/order', async(req, res)=>{
+            const result = await orderCollection.find().toArray();
+            res.send(result);
         });
 
     }
