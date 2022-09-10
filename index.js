@@ -26,9 +26,8 @@ function verifyJWT(req, res, next) {
         }
         res.decoded = decoded;
         next();
-    });
-    
-}
+    }); 
+};
 
 async function run() {
     try {
@@ -54,6 +53,12 @@ async function run() {
 
         app.get('/user',verifyJWT, async (req, res) =>{
             const result = await userCollection.find().toArray();
+            res.send(result);
+        });
+        app.delete('/user/:id', async(req, res) => {
+            const id = req.params;
+            const query = {_id: ObjectId(id)};
+            const result = await userCollection.deleteOne(query);
             res.send(result);
         });
 
