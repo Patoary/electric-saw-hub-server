@@ -16,17 +16,17 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 function verifyJWT(req, res, next) {
     const authHeader = req.headers.authorization;
-    if(!authHeader){
-        return res.status(401).send({message:'UnAuthorized Access'});
+    if (!authHeader) {
+        return res.status(401).send({ message: 'UnAuthorized Access' });
     }
     const token = authHeader.split(' ')[1];
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function(err, decoded){
-        if(err){
-            return res.status(403).send({message: 'Forbidden Access'});
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
+        if (err) {
+            return res.status(403).send({ message: 'Forbidden Access' });
         }
-        res.decoded = decoded;
+        req.decoded = decoded;
         next();
-    }); 
+    });
 };
 
 async function run() {
@@ -47,17 +47,17 @@ async function run() {
                 $set: user,
             };
             const result = await userCollection.updateOne(filter, updateDoc, options);
-            const token = jwt.sign({email: email}, process.env.ACCESS_TOKEN_SECRET,{ expiresIn: '6h' })
-            res.send({result, token});
+            const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '6h' })
+            res.send({ result, token });
         });
 
-        app.get('/user',verifyJWT, async (req, res) =>{
+        app.get('/user', verifyJWT, async (req, res) => {
             const result = await userCollection.find().toArray();
             res.send(result);
         });
-        app.delete('/user/:id', async(req, res) => {
+        app.delete('/user/:id', async (req, res) => {
             const id = req.params;
-            const query = {_id: ObjectId(id)};
+            const query = { _id: ObjectId(id) };
             const result = await userCollection.deleteOne(query);
             res.send(result);
         });
@@ -91,9 +91,19 @@ async function run() {
             res.send({ success: true, result });
         });
 
-        app.get('/order', async (req, res) => {
-            const result = await orderCollection.find().toArray();
-            res.send(result);
+        app.get('/order',verifyJWT, async (req, res) => {
+            const email = req.query.email;
+            const decodedEmail = req.decoded.email;
+            console.log('email:', email, 'decoded:', decodedEmail);
+            if (email === decodedEmail) {
+                const query = {userEmail: email};
+                const result = await orderCollection.find(query).toArray();
+                res.send(result);
+            }
+            else {
+                return res.status(403).send({ message: 'Forbidden Access' });
+            }
+
         });
 
         app.delete('/order/:id', async (req, res) => {
