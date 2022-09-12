@@ -37,9 +37,18 @@ async function run() {
         const orderCollection = client.db('sk_saw').collection('orders');
         const userCollection = client.db('sk_saw').collection('users');
 
+      
+
+        // to check user
+        app.get('/admin/:email', async(req, res) =>{
+            const email = req.params.email;
+            const user = await userCollection.findOne({email: email});
+            const isAdmin = user.role === 'admin';
+            res.send({admin: isAdmin});   
+        });
 
         // to make a new admin
-        app.put('/user/admin/:email', async(req, res) => {
+        app.put('/user/admin/:email',verifyJWT, async(req, res) => {
             const email = req.params.email;
             const filter = {email: email};
             const updateDoc = {
