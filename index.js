@@ -37,7 +37,16 @@ async function run() {
         const orderCollection = client.db('sk_saw').collection('orders');
         const userCollection = client.db('sk_saw').collection('users');
 
-      
+        // a simple middleware to check admin or not 
+        const verifyAdmin = async (req, res, next) => {
+            const requester = req.docoded?.email;
+            const requseterAccount = await userCollection.findOne({email: requester});
+            if(requseterAccount?.role === 'admin'){
+                next();
+            }else{
+                res.status(403).send({message: 'Forbidden'});
+            }
+        };
 
         // to check user
         app.get('/admin/:email', async(req, res) =>{
