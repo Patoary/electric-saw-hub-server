@@ -37,6 +37,7 @@ async function run() {
         const reviewCollection = client.db('sk_saw').collection('reviews');
         const orderCollection = client.db('sk_saw').collection('orders');
         const userCollection = client.db('sk_saw').collection('users');
+        const paymentCollection = client.db('sk_saw').collection('payments');
 
         // a simple middleware to check admin or not 
         const verifyAdmin = async (req, res, next) => {
@@ -145,9 +146,24 @@ async function run() {
         });
 
         app.delete('/order/:id', async (req, res) => {
-            const id = req.params;
+            const id = req.params.id;
             const query = { _id: ObjectId(id) }
             const result = await orderCollection.deleteOne(query);
+            res.send(result);
+        });
+
+        app.patch('/order/:id',verifyJWT, async(req, res) => {
+            const id = req.params.id;
+            const payment = req.body;
+            const filter = {_id: ObjectId(id)}
+            const updateDoc = {
+                $set: { 
+                    paid: true,
+                    transactionId : payment.transactionId,
+                },
+            };
+            const result = await paymentCollection.insertOne(payment);
+            const updateOrder = await orderCollection.updateOne(filter, updateDoc);
             res.send(result);
         });
         // for payment
