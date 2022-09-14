@@ -87,6 +87,21 @@ async function run() {
             const result = await userCollection.find().toArray();
             res.send(result);
         });
+
+        app.get('/user-data',verifyJWT, async (req, res) => {
+            const email = req.query.email;
+            const decodedEmail = req.decoded.email;
+            console.log('email:', email, 'decoded:', decodedEmail);
+            if (email === decodedEmail) {
+                const query = {email: email};
+                const result = await userCollection.findOne(query);
+                res.send(result);
+            }
+            else {
+                return res.status(403).send({ message: 'Forbidden Access' });
+            }
+
+        });
         app.delete('/user/:id', async (req, res) => {
             const id = req.params;
             const query = { _id: ObjectId(id) };
