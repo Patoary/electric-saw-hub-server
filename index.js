@@ -102,6 +102,19 @@ async function run() {
             }
 
         });
+
+        app.patch('/user/:id',verifyJWT, async(req, res) => {
+            const id = req.params.id;
+            const updatedProfile = req.body;
+            const filter = {_id: ObjectId(id)}
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: updatedProfile
+            };
+            const update = await userCollection.updateOne(filter, updateDoc, options);
+            res.send({ success: true, update });
+        });
+
         app.delete('/user/:id', async (req, res) => {
             const id = req.params;
             const query = { _id: ObjectId(id) };
