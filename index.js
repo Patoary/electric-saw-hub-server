@@ -5,6 +5,7 @@ require('dotenv').config();
 const app = express();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const res = require('express/lib/response');
 const port = process.env.PORT || 4000;
 
 
@@ -133,6 +134,12 @@ async function run() {
             const query = { _id: ObjectId(id) };
             const result = await productCollection.findOne(query);
             res.send(result);
+        });
+
+        app.post('/product', async(req, res) => {
+            const product = req.body;
+            const result = await productCollection.insertOne(product);
+            res.send({ success: true, result});
         });
 
         app.get('/review', async (req, res) => {
