@@ -6,7 +6,7 @@ const app = express();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const res = require('express/lib/response');
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 4000; 
 
 
 app.use(cors());
@@ -60,7 +60,7 @@ async function run() {
         });
 
         // to make a new admin
-        app.put('/user/admin/:email',verifyJWT, async(req, res) => {
+        app.put('/user/admin/:email',verifyJWT,verifyAdmin, async(req, res) => {
             const email = req.params.email;
             const filter = {email: email};
             const updateDoc = {
@@ -70,7 +70,7 @@ async function run() {
             res.send(result);
         });
 
-        // to add a new user
+       // to add a new user
         app.put('/user/:email', async (req, res) => {
             const email = req.params.email;
             const user = req.body;
@@ -123,26 +123,26 @@ async function run() {
             res.send(result);
         });
 
-        app.get('/product', async (req, res) => {
+        app.get('/product', verifyJWT, async (req, res) => {
             const query = {};
             const product = await productCollection.find(query).toArray();
             res.send(product);
         });
 
-        app.get('/product/:id', async (req, res) => {
+        app.get('/product/:id', verifyJWT, async (req, res) => {
             const id = req.params;
             const query = { _id: ObjectId(id) };
             const result = await productCollection.findOne(query);
             res.send(result);
         });
 
-        app.post('/product', async(req, res) => {
+        app.post('/product',verifyAdmin, async(req, res) => {
             const product = req.body;
             const result = await productCollection.insertOne(product);
             res.send({ success: true, result});
         });
 
-        app.get('/review', async (req, res) => {
+        app.get('/review',verifyJWT, async (req, res) => {
             const review = await reviewCollection.find().toArray();
             res.send(review);
         });
@@ -173,7 +173,7 @@ async function run() {
 
         });
 
-        app.get('/order/:id', async (req, res) => {
+        app.get('/order/:id',verifyJWT, async (req, res) => {
             const id = req.params;
             const query = {_id:ObjectId(id)};
             const result = await orderCollection.findOne(query);
