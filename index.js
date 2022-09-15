@@ -123,7 +123,7 @@ async function run() {
             res.send(result);
         });
 
-        app.get('/product', verifyJWT, async (req, res) => {
+        app.get('/product', async (req, res) => {
             const query = {};
             const product = await productCollection.find(query).toArray();
             res.send(product);
@@ -142,7 +142,7 @@ async function run() {
             res.send({ success: true, result});
         });
 
-        app.get('/review',verifyJWT, async (req, res) => {
+        app.get('/review', async (req, res) => {
             const review = await reviewCollection.find().toArray();
             res.send(review);
         });
