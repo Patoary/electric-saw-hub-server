@@ -136,7 +136,7 @@ async function run() {
             res.send(result);
         });
 
-        app.post('/product',verifyAdmin, async(req, res) => {
+        app.post('/product', async(req, res) => {
             const product = req.body;
             const result = await productCollection.insertOne(product);
             res.send({ success: true, result});
