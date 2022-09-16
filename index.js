@@ -136,10 +136,10 @@ async function run() {
             res.send(result);
         });
 
-        app.post('/product', async(req, res) => {
+        app.post('/product',verifyJWT, verifyAdmin, async(req, res) => {
             const product = req.body;
             const result = await productCollection.insertOne(product);
-            res.send({ success: true, result});
+            res.send(result);
         });
 
         app.get('/review', async (req, res) => {
